@@ -1,9 +1,9 @@
 {
   "name": "sourcemirror",
-  "displayName": "SourceMirror",
+  "displayName": "Source Mirror",
   "description": "Automatically mirrors listed source folders into listed destination folders",
   "publisher": "plasmanode",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.79.0"
   },
