@@ -29,7 +29,7 @@ function mirrorFiles(sourceDir, destDir) {
                   if (err) {
                     console.error(`Error creating directory ${nestedDestDir}:`, err);
                   } else {
-                    console.log(`Created directory: ${nestedDestDir}`);
+                    //console.log(`Created directory: ${nestedDestDir}`);
                     mirrorFiles(sourceFile, nestedDestDir); // Recursively mirror files in nested directory
                   }
                 });
@@ -45,7 +45,7 @@ function mirrorFiles(sourceDir, destDir) {
                   if (err) {
                     console.error(`Error copying ${sourceFile} to ${destFile}:`, err);
                   } else {
-                    console.log(`Copied ${sourceFile} to ${destFile}`);
+                    //console.log(`Copied ${sourceFile} to ${destFile}`);
                   }
                 });
               } else if (sourceStats.mtimeMs > destStats.mtimeMs) {
@@ -54,7 +54,7 @@ function mirrorFiles(sourceDir, destDir) {
                   if (err) {
                     console.error(`Error updating ${destFile} with ${sourceFile}:`, err);
                   } else {
-                    console.log(`Updated ${destFile} with ${sourceFile}`);
+                    //console.log(`Updated ${destFile} with ${sourceFile}`);
                   }
                 });
               }
@@ -77,19 +77,19 @@ function mirrorFiles(sourceDir, destDir) {
           fs.stat(sourceFile, (err) => {
             if (err && err.code === 'ENOENT') {
               if (fs.statSync(destFilePath).isDirectory()) {
-                fs.rmdir(destFilePath, { recursive: true }, err => {
+                fs.rm(destFilePath, { recursive: true }, err => {
                   if (err) {
                     console.error(`Error deleting directory ${destFilePath}:`, err);
                   } else {
-                    console.log(`Deleted directory ${destFilePath}`);
+                    //console.log(`Deleted directory ${destFilePath}`);
                   }
                 });
               } else {
-                fs.unlink(destFilePath, err => {
+                fs.rm(destFilePath, err => {
                   if (err) {
                     console.error(`Error deleting file ${destFilePath}:`, err);
                   } else {
-                    console.log(`Deleted file ${destFilePath}`);
+                    //console.log(`Deleted file ${destFilePath}`);
                   }
                 });
               }
@@ -99,6 +99,7 @@ function mirrorFiles(sourceDir, destDir) {
       });
     });
   }
+  
   
 
 function checkDirectoriesExist(source, destination) {
@@ -141,30 +142,30 @@ function processDirectories(source, destination) {
     return;
   }
 
-  console.log(`Source: ${source}, Destination: ${destination}`);
+  //console.log(`Source: ${source}, Destination: ${destination}`);
   mirroredPairs.push([source, destination]);
 }
 
-function startMirror(config, root, interval = 1000) {
+function startMirror(config, root, interval = 1000, err) {
   readFileAndProcess(config, root, processDirectories);
 
-  setInterval(() => {
-    mirroredPairs.forEach((paired) => {
-      mirrorFiles(paired[0], paired[1]);
-    });
-  }, interval);
+    setInterval(() => {
+        mirroredPairs.forEach((paired) => {
+            try {
+                mirrorFiles(paired[0], paired[1]);
+            } catch (error) {
+                err("Encountered an error!");
+                console.error("Error encountered: " + error);
+            }
+        });
+    }, interval);
 }
 
 function stopMirror() {
   mirroredPairs = [];
 }
 
-function testMessage() {
-  return "Mirror test message";
-}
-
 module.exports = {
   startMirror,
   stopMirror,
-  testMessage
 };

@@ -2,6 +2,7 @@
   "name": "sourcemirror",
   "displayName": "SourceMirror",
   "description": "Automatically mirrors listed source folders into listed destination folders",
+  "publisher": "plasma_node",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.79.0"
@@ -9,7 +10,10 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartup",
+    "onStartupFinished"
+  ],
   "main": "./extension.js",
   "contributes": {
     "commands": [
@@ -22,8 +26,12 @@
         "title": "SourceMirror: Stop"
       },
       {
+        "command": "sourcemirror.reload",
+        "title": "SourceMirror: Reload (Required if config updated)"
+      },
+      {
         "command": "sourcemirror.configure",
-        "title": "SourceMirror: Open config file"
+        "title": "SourceMirror: Open config file (must reload to apply changes)"
       }
     ],
     "configuration":{

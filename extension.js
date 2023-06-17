@@ -82,7 +82,7 @@ function openTextDocument(filePath) {
 	});
 }
 
-function start() {
+function start(autoLoaded) {
 
 
 	openOrCreateSourceMirrorFile();
@@ -90,7 +90,7 @@ function start() {
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	let sourceMirrorFilePath = "";
 	let rootPath;
-	
+
 	if (workspaceFolders && workspaceFolders.length > 0) {
 		rootPath = workspaceFolders[0].uri.fsPath;
 		sourceMirrorFilePath = path.join(rootPath, '.sourcemirror');
@@ -99,7 +99,11 @@ function start() {
 	mirror.startMirror(sourceMirrorFilePath, rootPath, 1000);
 
 	global.extension.Running = true;
-	msg("Running!")
+	if (autoLoaded) {
+		msg("Autostarted");
+	} else { 
+		msg("Running!")
+	};
 };
 
 function stop(){
@@ -142,12 +146,6 @@ function activate(context) {
 				msg("Starting...");
 				start();
 			}
-
-			/*
-			msg("Attempting to start: " + global.Test);
-			msgWarn("Test warning");
-			msgError("Test error")
-			*/
 		}),
 		vscode.commands.registerCommand('sourcemirror.stop', function () {
 			if (!global.extension.Running) {
@@ -161,16 +159,31 @@ function activate(context) {
 			msg("Opening configuration");
 			configure();
 		}),
+		vscode.commands.registerCommand('sourcemirror.reload', function () {
+			msg("Reloading...");
+			if (!global.extension.Running) { stop(); };
+			start();
+		}),
 	];
 
 
 
 	disposables.forEach(disposable => context.subscriptions.push(disposable));
 	//context.subscriptions.push(disposable);
+	const configuration = vscode.workspace.getConfiguration('sourcemirror');
+	if (configuration.get('autoStart')) {
+		start(true);
+	}
 }
 
+
+
 // This method is called when your extension is deactivated
-function deactivate() {}
+function deactivate() {
+	if (global.extension.Running) {
+		stop();
+	}
+}
 
 module.exports = {
 	activate,
