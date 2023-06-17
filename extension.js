@@ -3,6 +3,8 @@
 const vscode = require('vscode');
 require('./src/cfg');
 
+const path = require('path');
+const fs = require('fs');
 const mirror = require('./src/mirror');
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -24,9 +26,77 @@ function msgError(string) {
 };
 
 
+
+
+
+function openOrCreateSourceMirrorFile(shouldOpen) {
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+  
+	if (workspaceFolders && workspaceFolders.length > 0) {
+	  const rootPath = workspaceFolders[0].uri.fsPath;
+	  const sourceMirrorFilePath = path.join(rootPath, '.sourcemirror');
+  
+	  fs.access(sourceMirrorFilePath, fs.constants.F_OK, (err) => {
+		if (err) {
+		  // The file doesn't exist, create it if shouldOpen is false
+		  if (!shouldOpen) {
+			fs.writeFile(sourceMirrorFilePath, '', (err) => {
+			  if (err) {
+				console.error('Failed to create .sourcemirror file:', err);
+				return;
+			  }
+			  console.log('.sourcemirror file created successfully.');
+			});
+		  }
+		} else if (shouldOpen) {
+		  // The file exists and should be opened
+		  openTextDocument(sourceMirrorFilePath);
+		}
+  
+		if (!shouldOpen) {
+		  // Read the file content
+		  /*
+		  fs.readFile(sourceMirrorFilePath, 'utf8', (err, data) => {
+			if (err) {
+			  console.error('Failed to read .sourcemirror file:', err);
+			  return;
+			}
+			console.log('.sourcemirror file content:', data);
+		  });
+		  */
+		 return true;
+		}
+	  });
+	} else {
+	  vscode.window.showInformationMessage('No workspace is currently open.');
+	}
+}
+  
+function openTextDocument(filePath) {
+	vscode.workspace.openTextDocument(filePath).then((document) => {
+		vscode.window.showTextDocument(document);
+	}).then(() => {
+		console.log('.sourcemirror file opened successfully.');
+	}, (error) => {
+		console.error('Failed to open .sourcemirror file:', error);
+	});
+}
+
 function start() {
 
 
+	openOrCreateSourceMirrorFile();
+
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	let sourceMirrorFilePath = "";
+	let rootPath;
+	
+	if (workspaceFolders && workspaceFolders.length > 0) {
+		rootPath = workspaceFolders[0].uri.fsPath;
+		sourceMirrorFilePath = path.join(rootPath, '.sourcemirror');
+	}
+
+	mirror.startMirror(sourceMirrorFilePath, rootPath, 1000);
 
 	global.extension.Running = true;
 	msg("Running!")
@@ -34,9 +104,13 @@ function start() {
 
 function stop(){
 
-
+	mirror.stopMirror();
 	global.extension.Running = false;
 	msg("Stopped!")
+}
+
+function configure(){
+	openOrCreateSourceMirrorFile(true);
 }
 
 function activate(context) {
@@ -82,6 +156,10 @@ function activate(context) {
 				msg("Stopping...");
 				stop();
 			}
+		}),	
+		vscode.commands.registerCommand('sourcemirror.configure', function () {
+			msg("Opening configuration");
+			configure();
 		}),
 	];
 

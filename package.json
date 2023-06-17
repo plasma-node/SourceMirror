@@ -20,6 +20,10 @@
       {
         "command": "sourcemirror.stop",
         "title": "SourceMirror: Stop"
+      },
+      {
+        "command": "sourcemirror.configure",
+        "title": "SourceMirror: Open config file"
       }
     ],
     "configuration":{
