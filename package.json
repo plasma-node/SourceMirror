@@ -2,10 +2,14 @@
   "name": "sourcemirror",
   "displayName": "SourceMirror",
   "description": "Automatically mirrors listed source folders into listed destination folders",
-  "publisher": "plasma_node",
+  "publisher": "plasmanode",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.79.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plasma-node/SourceMirror"
   },
   "categories": [
     "Other"
