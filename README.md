@@ -1,13 +1,19 @@
-# sourcemirror README
+# Source Mirror
 
-SourceMirror: An extension that allows you to synchronize one folder into another
+An extension that allows you to synchronize one folder into another
 
 ## Features
 
 
+## Usage
 
-## Requirements
+Add a .sourcemirror file in root working directory
 
+Format is 
+
+`sourceFolder -> destinationFolder`
+
+eg `src/SomeFolder -> etc/Foo/Bar/Biz` will automatically mirror *SomeFolder* into *Biz* 
 
 ## Extension Settings
 
